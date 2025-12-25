@@ -1,80 +1,132 @@
-✅ README Template: Program 2 — Sparse Matrix Data Structures & MV Products
-📌 Overview
+# Sparse Matrix–Vector Multiplication Using Structured Storage Formats
 
-This project implements multiple sparse matrix data structures and uses them to compute matrix–vector products efficiently.
-The assignment covers COO, CSR, Modified CSR, Ellpack–Itpack, Symmetric CSR, and Compressed Diagonal formats.
+## Overview
+This project implements and evaluates multiple algorithms for **sparse matrix–vector multiplication** using different compressed storage formats. The goal is to reduce unnecessary computation and memory usage by exploiting sparsity and structure in matrices.
 
-🧠 Key Concepts
+All algorithms are implemented in **MATLAB** and tested against MATLAB’s built-in routines to evaluate **accuracy**, **runtime performance**, and **scalability** as the matrix dimension `n` increases.
 
-Sparse matrix compression
+---
 
-Row pointers (IA), column indices (JA), and compressed arrays (AA)
+## Tasks and Algorithms Implemented
 
-Efficient matrix–vector multiplication
+### Task 1: In-Row-Order COO Matrix–Vector Products
 
-Handling unordered COO input
+#### (a) COO → CSR Conversion and Multiplication
+Converts a sparse matrix from **Coordinate (COO)** format to **Compressed Sparse Row (CSR)** format and computes:
 
-Exploiting matrix symmetry and bandedness
+    z = A v
 
-📦 Implemented Data Structures & Algorithms
-✔️ 1. COO → CSR → Matrix–Vector Product
+- Builds row pointer array `IA`
+- Uses dot products per row
+- Efficient for row-based access
+- Time complexity: **O(nnz)**
 
-Standard CSR format:
+---
 
-AA = nonzero values
+#### (b) COO → Modified CSR Conversion and Multiplication
+Stores diagonal and off-diagonal elements separately to reduce storage overhead.
 
-JA = column indices
+- Diagonal elements stored explicitly
+- Off-diagonal elements stored row-wise
+- Optimized storage for sparse matrices
+- Demonstrates space–time tradeoffs
 
-IA = row pointer
+---
 
-✔️ 2. Modified CSR
+#### (c) COO → Ellpack–Itpack Conversion and Multiplication
+Converts COO format into **Ellpack–Itpack** representation.
 
-Stores:
+- Uses fixed-width row storage
+- Pads rows with zeros as needed
+- Efficient for vectorized computation
+- Time complexity depends on maximum nonzeros per row
 
-Diagonal elements separately
+---
 
-Off-diagonal values and pointers
+### Task 2: Unordered COO → Relaxed CSR
+Handles COO matrices where row indices are **not sorted**.
 
-Reduces branching during multiplication
+- Sorts row indices
+- Builds CSR structure with **elbow room** for insertion
+- Computes matrix–vector product using relaxed CSR
+- Demonstrates dynamic sparse matrix storage
 
-✔️ 3. COO → Ellpack–Itpack
+---
 
-Fixed number of columns per row
+### Task 3: Symmetric CSR Storage
+Implements CSR storage for **symmetric matrices** by storing **only the lower triangular part**.
 
-Useful for vectorized computation
+- Reduces memory requirements
+- Exploits symmetry during multiplication
+- Automatically adds mirrored contributions
+- Accurate for large matrix sizes
 
-✔️ 4. Unordered COO → Relaxed CSR
+---
 
-Handles input where row order is arbitrary
+### Task 4: Compressed Diagonal Storage
+Handles matrices with **three nonzero diagonals** (main, sub, super).
 
-Adds “elbow room” for insertions
+- Automatically detects diagonal offset `k`
+- Stores diagonals in a compact array
+- Uses offset indexing for multiplication
 
-✔️ 5. Symmetric CSR
+**Note:**  
+- Works correctly for `k = 1`
+- Produces incorrect results for `k > 1` due to an indexing issue
 
-Stores only lower triangular part
+---
 
-Automatically adds symmetric contributions during MV product
+## Experimental Design
 
-✔️ 6. Compressed Diagonal Storage (CDS)
+- Matrix and vector entries generated synthetically
+- Dimensions tested up to `n = 1000`
+- Performance metrics:
+  - **Runtime**
+  - **Relative error** compared to MATLAB built-in routines
 
-Extracts the main diagonal and offset diagonals
+### Relative Error Definition
 
-For banded matrices with bandwidth 
-𝑘
-k
+    ||x_comp − x_true|| / ||x_true||
 
-🧪 Experimental Design
+---
 
-Random sparse matrices tested across many dimensions
+## Results and Observations
 
-Accuracy verified by comparing with dense multiplication
+- All Task 1 algorithms produce correct results with low relative error
+- MATLAB’s built-in routines outperform custom implementations in runtime
+- Error increases with problem size due to floating-point accumulation
+- Symmetric CSR achieves correct results with reduced storage
+- Compressed diagonal method fails for offsets greater than 1
 
-Performance improvement measured qualitatively
+---
 
-📈 Results Summary
+## Files Included
 
-All formats produce correct products
+### Task 1
+- `COO_to_CSR_Mv_mult.m`
+- `COO_to_modified_CSR_Mv_mult.m`
+- `COO_to_ELL_Mv_mult.m`
+- `task1_driver.m`
 
-Symmetric CSR and CDS significantly reduce storage
+### Task 2
+- `COO_to_relaxed_CSR_Mv_mult.m`
+- `task2_driver.m`
 
-Ellpack performs consistently for evenly distributed sparsity
+### Task 3
+- `Task3.m`
+- `task3_driver.m`
+
+### Task 4
+- `task4.m`
+- `task4_driver.m`
+
+Each task is implemented in a separate MATLAB file with an accompanying testing script.
+
+---
+
+## Key Takeaways
+
+- Sparse storage formats significantly reduce unnecessary computation
+- Algorithmic efficiency depends heavily on matrix structure
+- Built-in MATLAB routines remain highly optimized
+- Correct indexing is critical in compressed storage algorithms
